@@ -1,0 +1,9 @@
+name: ScapeChat
+version: '${project.version}'
+main: net.devscape.project.scapechat.ScapeChat
+api-version: 1.13
+authors: [DevScape]
+
+commands:
+  scapechat:
+    aliases: [schat, scapec]

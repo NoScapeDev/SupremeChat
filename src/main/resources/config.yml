@@ -1,0 +1,321 @@
+# ==================================================
+# !SCAPECHAT PLUGIN!
+# If you're in need of support or have encounted any errors please join the discord server:
+# https://discord.gg/AnPwty8asP
+#
+# - PlaceholderAPI Support
+# - Vault Support
+# ==================================================
+# mute chat settings
+mute-chat: false
+bypass-mute-chat-permission: 'sc.bypass.mutechat'
+ops-bypass-mute-chat: true
+# chat color permission (Allow players to use &0-f & hex colors in chat)
+chat-color-permission: 'sc.chat.color'
+
+# ==================================================
+# CHAT FORMATTING:
+#
+# format - globally
+# groups - Uses VaultAPI Groups to check what rank the player is.
+#  * set `group-formatting` to `true` to enable groups.
+# ==================================================
+
+# globally be used for everyone if `group-formatting` is set to `false`.
+format: '%vault_prefix%%name% &8➟ &7%message%'
+
+group-formatting: false
+groups:
+  default: '%vault_prefix%&7%name% &8➟ &7%message%'
+  vip: '%vault_prefix%&7%name% &8➟ &a%message%'
+  helper: '%vault_prefix%&7%name% &8➟ &e%message%'
+  mod: '%vault_prefix%&7%name% &8➟ &b%message%'
+  admin: '%vault_prefix%&7%name% &8➟ &c%message%'
+  owner: '%vault_prefix%&7%name% &8➟ &c%message%'
+
+hover: # used when you hover over the chat sent by player
+  enable: true
+  string:
+    - '&8&m---------------'
+    - '&7World: &b%world%'
+    - '&7Rank: %vault_prefix%'
+    - '&8&m---------------'
+click: # used when you click on the chat sent by player
+  enable: true
+  string: '/msg %player_name% '
+
+# ==================================================
+# JOIN & LEAVE:
+#
+# To add a "silent" join type put the custom options to empty ''
+# Example: custom-join: ''
+# Example: custom-leave: ''
+# ==================================================
+
+custom-join: '&8[&a&l+&8] &7%name%'
+custom-leave: '&8[&c&l-&8] &7%name%'
+
+vanish-support: true # allow to join silent if vanished.
+
+motd:
+  - '&8&m----------------------------'
+  - '&#ca04fb&lY&#d006e2&lO&#d509c9&lU&#db0bb0&lR&#e10e97&lS&#e6107e&lE&#ec1365&lR&#f2154c&lV&#f71833&lE&#fd1a1a&lR'
+  - '&#C3C3C3Welcome to the server, %name%!'
+  - ''
+  - '&#FDB600This is the example MOTD'
+  - ''
+  - '&7&OScapeChat by DevScape, thanks for using..'
+  - '&8&m----------------------------'
+
+# ==================================================
+# CUSTOM COMMANDS:
+#
+# <command_label>:
+#  string: '<your message here that will send to the player>'
+#
+# Custom commands will be extended soon...
+# ==================================================
+
+custom-commands:
+  discord: # discord name is your command label.
+    string: '&9&lDiscord: &7discord.gg/yourserver'
+  store: # store name is your command label.
+    string: '&b&lStore: &7store.yourserver.com'
+
+# ==================================================
+# CHAT FILTER:
+#
+# set `chat-delay` to 0 if you want to disable chat delay.
+# set `action-detect` to 0 if you want to disable 'action'.
+# ==================================================
+
+word-detect: '&cThe word &7%word% &cis banned from the server!'
+word-detect-staff: '&c[Filter] &7%name%: &c[&7%message%&c]'
+word-detect-alert-staff: true
+detect-alert-staff-permission: 'sc.alert.staff'
+
+# to disable chat delays, set 'chat-delay' to 0
+chat-delay: 1 # how long should ScapeChat stop the playing from chatting for? in seconds.
+chat-warn: '&cPlease slow down, you''re chatting too fast...'
+
+repeat-enable: true
+repeat-warn: '&cPlease do not repeat the same messages.'
+
+# to disable command delays, set 'command-delay' to 0
+command-delay: 1 # in seconds
+command-warn: '&cPlease slow down, you''re executing commands too fast...'
+
+# ==================================================
+# INTERACTIONS CHAT:
+# ==================================================
+# item in chat settings
+enable-chat-item: true
+chat-item-strings: # message string that will grab the item the player is holding.
+  - '[i]'
+  - '[item]'
+chat-item-replace: '&8[&b%item%&8]' # this will be the message that will replace the item string.
+
+# ==================================================
+# BLOCKED WORDS
+# Note: Some words may be missing as i've copied these from some lists online.
+# ==================================================
+banned-words:
+  - 'anal'
+  - 'anus'
+  - 'arse'
+  - 'ass'
+  - 'ballsack'
+  - 'balls'
+  - 'bastard'
+  - 'bitch'
+  - 'biatch'
+  - 'bloody'
+  - 'blowjob'
+  - 'blow job'
+  - 'bollock'
+  - 'bollok'
+  - 'boner'
+  - 'boob'
+  - 'bugger'
+  - 'bum'
+  - 'butt'
+  - 'buttplug'
+  - 'clitoris'
+  - 'cock'
+  - 'coon'
+  - 'crap'
+  - 'cunt'
+  - 'damn'
+  - 'dick'
+  - 'dildo'
+  - 'dyke'
+  - 'fag'
+  - 'feck'
+  - 'fellate'
+  - 'fellatio'
+  - 'felching'
+  - 'fuck'
+  - 'f u c k'
+  - 'fudgepacker'
+  - 'flange'
+  - 'Goddamn'
+  - 'God damn'
+  - 'hell'
+  - 'homo'
+  - 'jerk'
+  - 'jizz'
+  - 'knobend'
+  - 'knob end'
+  - 'labia'
+  - 'lmao'
+  - 'lmfao'
+  - 'muff'
+  - 'nigger'
+  - 'nigga'
+  - 'omg'
+  - 'penis'
+  - 'piss'
+  - 'poop'
+  - 'prick'
+  - 'pube'
+  - 'pussy'
+  - 'queer'
+  - 'scrotum'
+  - 'sex'
+  - 'shit'
+  - 'slut'
+  - 'smegma'
+  - 'spunk'
+  - 'tit'
+  - 'tosser'
+  - 'turd'
+  - 'twat'
+  - 'vagina'
+  - 'wank'
+  - 'whore'
+  - 'wtf'
+  - 'arse'
+  - 'arsehole'
+  - 'balls'
+  - 'bastard'
+  - 'beaver'
+  - 'bell'
+  - 'bellend'
+  - 'bent'
+  - 'berk'
+  - 'bint'
+  - 'bitch'
+  - 'blighter'
+  - 'blimey'
+  - 'bloodclaat'
+  - 'bloody'
+  - 'blooming'
+  - 'bollocks'
+  - 'bonk'
+  - 'bukkake'
+  - 'bullshit'
+  - 'cack'
+  - 'cad'
+  - 'chav'
+  - 'choad'
+  - 'chuffer'
+  - 'clunge'
+  - 'cobblers'
+  - 'cock'
+  - 'cock-up'
+  - 'cocksucker'
+  - 'cockwomble'
+  - 'codger'
+  - 'corey'
+  - 'cow'
+  - 'crap'
+  - 'crikey'
+  - 'cunt'
+  - 'daft'
+  - 'damn'
+  - 'dick'
+  - 'dickhead'
+  - 'dildo'
+  - 'dodgy'
+  - 'duffer'
+  - 'fanny'
+  - 'feck'
+  - 'flaps'
+  - 'fuck'
+  - 'fucktard'
+  - 'gash'
+  - 'ginger'
+  - 'goddam'
+  - 'gorblimey'
+  - 'gormless'
+  - 'hell'
+  - 'hobknocker'
+  - 'jizz'
+  - 'knob'
+  - 'knobber'
+  - 'knobend'
+  - 'knobhead'
+  - 'ligger'
+  - 'manky'
+  - 'minge'
+  - 'minger'
+  - 'minging'
+  - 'motherfucker'
+  - 'munter'
+  - 'muppet'
+  - 'naff'
+  - 'nitwit'
+  - 'nonce'
+  - 'numpty'
+  - 'nutter'
+  - 'penguin'
+  - 'pillock'
+  - 'pish'
+  - 'piss off'
+  - 'piss-flaps'
+  - 'pissed'
+  - 'pissed off'
+  - 'plonker'
+  - 'ponce'
+  - 'poof'
+  - 'pouf'
+  - 'poxy'
+  - 'prat'
+  - 'prick'
+  - 'prick'
+  - 'prickteaser'
+  - 'punani'
+  - 'punny'
+  - 'pussy'
+  - 'randy'
+  - 'rapey'
+  - 'rat arsed'
+  - 'rotter'
+  - 'rubbish'
+  - 'scrubber'
+  - 'shag'
+  - 'shit'
+  - 'shite'
+  - 'shitfaced'
+  - 'skank'
+  - 'slag'
+  - 'slapper'
+  - 'slut'
+  - 'snatch'
+  - 'sod'
+  - 'sod-off'
+  - 'spunk'
+  - 'swine'
+  - 'tart'
+  - 'tits'
+  - 'toff'
+  - 'tosser'
+  - 'trollop'
+  - 'tuss'
+  - 'twat'
+  - 'twonk'
+  - 'wally'
+  - 'wanker'
+  - 'wankstain'
+  - 'wazzack'
+  - 'whore'
