@@ -8,6 +8,7 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
@@ -149,6 +150,41 @@ public class FormattingUtils {
             } else {
                 e.setCancelled(true);
                 msgPlayer(player, ScapeChat.getInstance().getConfig().getString("command-warn"));
+            }
+        }
+    }
+
+    // ==================================================
+    // ITEM IN CHAT
+    // ==================================================
+
+    public static void onItem(AsyncPlayerChatEvent e) {
+        Player player = e.getPlayer();
+        if (e.isCancelled()) return;
+        if (isChatMuted())
+            e.setCancelled(player.hasPermission(ScapeChat.getInstance().getConfig().getString("bypass-mute-chat-permission")));
+
+        ItemStack i = player.getInventory().getItemInMainHand();
+        boolean itemChat = ScapeChat.getInstance().getConfig().getBoolean("enable-chat-item");
+        String replacement = ScapeChat.getInstance().getConfig().getString("chat-item-replace");
+        assert replacement != null;
+
+        if (i.getItemMeta() != null) {
+            replacement = replacement.replaceAll("%item%", format("x" + i.getAmount() + " " + i.getItemMeta().getDisplayName()));
+        } else {
+            replacement = replacement.replaceAll("%item%", format("x" + i.getAmount() + " " + i.getType().name()));
+        }
+
+
+        String message = e.getMessage();
+
+        if (i != null) {
+            if (itemChat) {
+                for (String i_strings : ScapeChat.getInstance().getConfig().getStringList("chat-item-strings")) {
+                    if (message.contains(i_strings)) {
+                        e.setMessage(message.replace(i_strings, format(replacement)));
+                    }
+                }
             }
         }
     }
