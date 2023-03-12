@@ -28,7 +28,17 @@ public class FormattingUtils {
         if (isChatMuted())
             e.setCancelled(player.hasPermission(ScapeChat.getInstance().getConfig().getString("bypass-mute-chat-permission")));
 
-        String chat = getGlobalFormat();
+        String rank = getRank(player);
+        boolean grouping = ScapeChat.getInstance().getConfig().getBoolean("group-formatting");
+
+        String chat;
+
+        if (grouping) {
+            chat = getRankFormat(rank);
+        } else {
+            chat = getGlobalFormat();
+        }
+
         chat = addChatPlaceholers(chat, player, e.getMessage());
 
         String permission = ScapeChat.getInstance().getConfig().getString("chat-color-permission");

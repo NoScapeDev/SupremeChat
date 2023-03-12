@@ -38,6 +38,10 @@ public class Message {
         return ScapeChat.getInstance().getConfig().getString("format");
     }
 
+    public static String getRankFormat(String rank) {
+        return ScapeChat.getInstance().getConfig().getString("groups." + rank);
+    }
+
     public static String getLeave() {
         return ScapeChat.getInstance().getConfig().getString("custom-leave");
     }
