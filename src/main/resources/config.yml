@@ -83,6 +83,16 @@ custom-commands:
     string: '&b&lStore: &7store.yourserver.com'
 
 # ==================================================
+# MENTION
+# ==================================================
+
+mention-replacement: '&e%target%'
+mention-spaces: true
+mention-sound:
+  enable: true
+  sound: 'ENTITY_LEVELUP'
+
+# ==================================================
 # CHAT FILTER:
 #
 # set `chat-delay` to 0 if you want to disable chat delay.
@@ -97,6 +107,11 @@ detect-alert-staff-permission: 'sc.alert.staff'
 # to disable chat delays, set 'chat-delay' to 0
 chat-delay: 1 # how long should ScapeChat stop the playing from chatting for? in seconds.
 chat-warn: '&cPlease slow down, you''re chatting too fast...'
+
+caps-lowercase: true # changes caps to lowercase
+caps-limit: 4 # how many caps should be limited until it detects.
+disable-caps-warn: false # set true if you want to disable 'caps-warn'
+caps-warn: '&cPlease do not use CAPS!'
 
 repeat-enable: true
 repeat-warn: '&cPlease do not repeat the same messages.'

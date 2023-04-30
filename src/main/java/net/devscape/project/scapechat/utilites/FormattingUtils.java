@@ -94,6 +94,7 @@ public class FormattingUtils {
                         detect_alert = detect_alert.replaceAll("%name%", player.getName());
 
                         msgPlayer(staff, detect_alert);
+                        break;
                     }
                 }
             }
@@ -115,7 +116,7 @@ public class FormattingUtils {
             }
         }
 
-        // REPART FILTER
+        // REPEAT FILTER
         if (ScapeChat.getInstance().getLastMessage().containsKey(player)) {
             String lastMessage = ScapeChat.getInstance().getLastMessage().get(player);
             String newMessage = e.getMessage();
@@ -130,6 +131,21 @@ public class FormattingUtils {
         } else {
             String newMessage = e.getMessage();
             ScapeChat.getInstance().getLastMessage().put(player, newMessage);
+        }
+
+        // CAPS FILTER
+        if (ScapeChat.getInstance().getConfig().getBoolean("caps-lowercase")) {
+            if (e.getMessage().chars().filter(Character::isUpperCase).count() >= ScapeChat.getInstance().getConfig().getInt("caps-limit")) {
+                for (final char c : e.getMessage().toCharArray()) {
+                    if (Character.isUpperCase(c)) {
+                        if (!ScapeChat.getInstance().getConfig().getBoolean("disable-caps-warn")) {
+                            msgPlayer(player, ScapeChat.getInstance().getConfig().getString("caps-warn"));
+                        }
+                        e.setMessage(format(e.getMessage().toLowerCase()));
+                        break;
+                    }
+                }
+            }
         }
     }
 
@@ -175,15 +191,13 @@ public class FormattingUtils {
             replacement = replacement.replaceAll("%item%", format("x" + i.getAmount() + " " + i.getType().name()));
         }
 
-
         String message = e.getMessage();
 
-        if (i != null) {
-            if (itemChat) {
-                for (String i_strings : ScapeChat.getInstance().getConfig().getStringList("chat-item-strings")) {
-                    if (message.contains(i_strings)) {
-                        e.setMessage(message.replace(i_strings, format(replacement)));
-                    }
+        if (itemChat) {
+            for (String i_strings : ScapeChat.getInstance().getConfig().getStringList("chat-item-strings")) {
+                if (message.contains(i_strings)) {
+                    e.setMessage(message.replace(i_strings, format(replacement)));
+                    break;
                 }
             }
         }
