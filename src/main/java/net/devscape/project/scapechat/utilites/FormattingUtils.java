@@ -121,7 +121,7 @@ public class FormattingUtils {
             String lastMessage = ScapeChat.getInstance().getLastMessage().get(player);
             String newMessage = e.getMessage();
 
-            if (newMessage.equalsIgnoreCase(lastMessage)) {
+            if (newMessage.contains(lastMessage)) {
                 e.setCancelled(true);
                 msgPlayer(player, ScapeChat.getInstance().getConfig().getString("repeat-warn"));
             } else {

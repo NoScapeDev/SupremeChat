@@ -79,7 +79,6 @@ public class Message {
         return string;
     }
 
-
     public static String deformat(String str) {
         return ChatColor.stripColor(format(str));
     }
