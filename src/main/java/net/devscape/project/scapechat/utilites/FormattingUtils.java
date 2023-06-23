@@ -117,20 +117,22 @@ public class FormattingUtils {
         }
 
         // REPEAT FILTER
-        if (ScapeChat.getInstance().getLastMessage().containsKey(player)) {
-            String lastMessage = ScapeChat.getInstance().getLastMessage().get(player);
-            String newMessage = e.getMessage();
+        if (ScapeChat.getInstance().getConfig().getBoolean("repeat-enable")) {
+            if (ScapeChat.getInstance().getLastMessage().containsKey(player)) {
+                String lastMessage = ScapeChat.getInstance().getLastMessage().get(player);
+                String newMessage = e.getMessage();
 
-            if (newMessage.contains(lastMessage)) {
-                e.setCancelled(true);
-                msgPlayer(player, ScapeChat.getInstance().getConfig().getString("repeat-warn"));
+                if (newMessage.contains(lastMessage)) {
+                    e.setCancelled(true);
+                    msgPlayer(player, ScapeChat.getInstance().getConfig().getString("repeat-warn"));
+                } else {
+                    ScapeChat.getInstance().getLastMessage().remove(player);
+                    ScapeChat.getInstance().getLastMessage().put(player, newMessage);
+                }
             } else {
-                ScapeChat.getInstance().getLastMessage().remove(player);
+                String newMessage = e.getMessage();
                 ScapeChat.getInstance().getLastMessage().put(player, newMessage);
             }
-        } else {
-            String newMessage = e.getMessage();
-            ScapeChat.getInstance().getLastMessage().put(player, newMessage);
         }
 
         // CAPS FILTER
