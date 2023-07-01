@@ -1,17 +1,18 @@
 # ==================================================
-# !SCAPECHAT PLUGIN!
+# SUPREMECHAT PLUGIN
 # If you're in need of support or have encounted any errors please join the discord server:
 # https://discord.gg/AnPwty8asP
 #
 # - PlaceholderAPI Support
 # - Vault Support
 # ==================================================
+
 # mute chat settings
 mute-chat: false
-bypass-mute-chat-permission: 'sc.bypass.mutechat'
+bypass-mute-chat-permission: 'supremechat.bypass.mutechat'
 ops-bypass-mute-chat: true
 # chat color permission (Allow players to use &0-f & hex colors in chat)
-chat-color-permission: 'sc.chat.color'
+chat-color-permission: 'supremechat.chat.color'
 
 # ==================================================
 # CHAT FORMATTING:
@@ -20,6 +21,9 @@ chat-color-permission: 'sc.chat.color'
 # groups - Uses VaultAPI Groups to check what rank the player is.
 #  * set `group-formatting` to `true` to enable groups.
 # ==================================================
+
+# should you want SupremeChat's chat function disabled?
+enable-chat-format: true
 
 # globally be used for everyone if `group-formatting` is set to `false`.
 format: '%vault_prefix%%name% &8➟ &7%message%'
@@ -64,7 +68,7 @@ motd:
   - ''
   - '&#FDB600This is the example MOTD'
   - ''
-  - '&7&OScapeChat by DevScape, thanks for using..'
+  - '&7&OSupremeChat by DevScape, thanks for using..'
   - '&8&m----------------------------'
 
 # ==================================================
@@ -105,7 +109,7 @@ word-detect-alert-staff: true
 detect-alert-staff-permission: 'sc.alert.staff'
 
 # to disable chat delays, set 'chat-delay' to 0
-chat-delay: 1 # how long should ScapeChat stop the playing from chatting for? in seconds.
+chat-delay: 1 # how long should SupremeChat stop the playing from chatting for? in seconds.
 chat-warn: '&cPlease slow down, you''re chatting too fast...'
 
 caps-lowercase: true # changes caps to lowercase
@@ -119,6 +123,15 @@ repeat-warn: '&cPlease do not repeat the same messages.'
 # to disable command delays, set 'command-delay' to 0
 command-delay: 1 # in seconds
 command-warn: '&cPlease slow down, you''re executing commands too fast...'
+
+# ==================================================
+# COMMAND-SPY
+# ==================================================
+
+enable-command-spy: true
+cs-spy: '&c[Command-Spy] &7%name%: &f/%command%'
+whitelist-spy-commands:
+  - 'spawn'
 
 # ==================================================
 # INTERACTIONS CHAT:

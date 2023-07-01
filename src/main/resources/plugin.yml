@@ -1,9 +1,9 @@
-name: ScapeChat
+name: SupremeChat
 version: '${project.version}'
-main: net.devscape.project.scapechat.ScapeChat
+main: net.devscape.project.supremechat.SupremeChat
 api-version: 1.13
 authors: [DevScape]
 
 commands:
-  scapechat:
-    aliases: [schat, scapec]
+  supremechat:
+    aliases: [schat]

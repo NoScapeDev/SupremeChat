@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>net.devscape.project</groupId>
-    <artifactId>ScapeChat</artifactId>
-    <version>1.2.4</version>
+    <artifactId>SupremeChat</artifactId>
+    <version>1.2.5</version>
     <packaging>jar</packaging>
 
-    <name>ScapeChat</name>
+    <name>SupremeChat</name>
 
     <properties>
         <java.version>1.8</java.version>
