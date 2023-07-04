@@ -6,7 +6,7 @@
 
     <groupId>net.devscape.project</groupId>
     <artifactId>SupremeChat</artifactId>
-    <version>1.2.5</version>
+    <version>1.2.6</version>
     <packaging>jar</packaging>
 
     <name>SupremeChat</name>
@@ -54,7 +54,7 @@
 
     <repositories>
         <repository>
-            <id>spigotmc-repo</id>
+            <id>spigot-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
         <repository>
