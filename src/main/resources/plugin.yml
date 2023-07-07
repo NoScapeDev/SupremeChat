@@ -7,3 +7,5 @@ authors: [DevScape]
 commands:
   supremechat:
     aliases: [schat]
+  staffchat:
+    aliases: [sc, staffc]

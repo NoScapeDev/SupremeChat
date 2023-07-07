@@ -3,6 +3,8 @@ package net.devscape.project.supremechat;
 import net.devscape.project.supremechat.commands.SCCommand;
 import net.devscape.project.supremechat.hooks.Metrics;
 import net.devscape.project.supremechat.listeners.*;
+import net.devscape.project.supremechat.utils.FormatUtil;
+import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -17,13 +19,19 @@ public final class SupremeChat extends JavaPlugin {
 
     private static SupremeChat instance;
     private static Permission perms = null;
+    private static Chat chat;
 
     private final List<Player> chatDelayList = new ArrayList<>();
     private final List<Player> commandDelayList = new ArrayList<>();
     private final Map<Player, String> lastMessage = new HashMap<>();
+    private FormatUtil formattingUtils;
 
     public static SupremeChat getInstance() {
         return instance;
+    }
+
+    public static Chat getChat() {
+        return chat;
     }
 
     @Override
@@ -49,6 +57,7 @@ public final class SupremeChat extends JavaPlugin {
 
         if (getServer().getPluginManager().getPlugin("Vault") != null) {
             setupPermissions();
+            setupChat();
         }
 
         getCommand("supremechat").setExecutor(new SCCommand());
@@ -73,13 +82,20 @@ public final class SupremeChat extends JavaPlugin {
         return perms;
     }
 
+    private void setupChat() {
+        RegisteredServiceProvider<Chat> rsp = getServer().getServicesManager().getRegistration(Chat.class);
+        assert rsp != null;
+        chat = rsp.getProvider();
+    }
+
     public List<Player> getChatDelayList() {
         return chatDelayList;
     }
 
     public void reload() {
         super.reloadConfig();
-        saveDefaultConfig();
+
+
     }
 
     public Map<Player, String> getLastMessage() {

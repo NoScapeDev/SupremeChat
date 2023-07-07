@@ -9,7 +9,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
-import static net.devscape.project.supremechat.utilites.Message.format;
+import static net.devscape.project.supremechat.utils.Message.format;
 
 public class Mention implements Listener {
 
