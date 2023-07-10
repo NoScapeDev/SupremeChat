@@ -16,10 +16,10 @@ public class JoinLeave implements Listener {
         Player player = e.getPlayer();
 
         String join = getJoin();
-        join = addOtherPlaceholers(join, player);
+        join = addOtherPlaceholders(join, player);
 
         for (String motd : SupremeChat.getInstance().getConfig().getStringList("motd")) {
-            motd = addOtherPlaceholers(motd, player);
+            motd = addOtherPlaceholders(motd, player);
             msgPlayer(player, motd);
         }
 
@@ -35,7 +35,7 @@ public class JoinLeave implements Listener {
         Player player = e.getPlayer();
 
         String leave = getLeave();
-        leave = addOtherPlaceholers(leave, player);
+        leave = addOtherPlaceholders(leave, player);
 
         if (!SupremeChat.getInstance().getConfig().getString("custom-leave").isEmpty()) {
             e.setQuitMessage(format(leave));

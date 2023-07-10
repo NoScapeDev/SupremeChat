@@ -27,7 +27,7 @@ public class Formatting implements Listener {
         Player player = e.getPlayer();
         if (e.isCancelled()) return;
 
-        if (SupremeChat.getInstance().getConfig().getBoolean("mute-chat"))  {
+        if (SupremeChat.getInstance().getConfig().getBoolean("mute-chat")) {
             if (!player.hasPermission(Objects.requireNonNull(SupremeChat.getInstance().getConfig().getString("bypass-mute-chat-permission")))) {
                 msgPlayer(player, "&cChat is currently muted!");
                 e.setCancelled(true);
@@ -114,42 +114,43 @@ public class Formatting implements Listener {
         }
 
 
-
-
-
-
-
         // ITEM IN CHAT
-        ItemStack i = player.getInventory().getItemInMainHand();
+        ItemStack item = player.getInventory().getItemInMainHand();
         boolean itemChat = SupremeChat.getInstance().getConfig().getBoolean("enable-chat-item");
         String replacement = SupremeChat.getInstance().getConfig().getString("chat-item-replace");
         assert replacement != null;
 
-        if (i.getItemMeta() != null) {
-            replacement = replacement.replaceAll("%item%", format("x" + i.getAmount() + " " + i.getItemMeta().getDisplayName()));
+        if (item.getItemMeta() != null) {
+            String displayName = item.getItemMeta().hasDisplayName() ? item.getItemMeta().getDisplayName() : item.getType().name();
+            replacement = replacement.replaceAll("%item%", format("x" + item.getAmount() + " " + displayName));
         } else {
-            replacement = replacement.replaceAll("%item%", format("x" + i.getAmount() + " " + i.getType().name()));
+            replacement = replacement.replaceAll("%item%", format("x" + item.getAmount() + " " + item.getType().name()));
         }
 
         String message = e.getMessage();
 
         if (itemChat) {
-            for (String i_strings : SupremeChat.getInstance().getConfig().getStringList("chat-item-strings")) {
-                if (message.contains(i_strings)) {
-                    e.setMessage(message.replace(i_strings, format(replacement)));
+            for (String itemString : SupremeChat.getInstance().getConfig().getStringList("chat-item-strings")) {
+                if (message.contains(itemString)) {
+                    e.setMessage(message.replace(itemString, format(replacement)));
                     break;
                 }
             }
         }
 
-        // CHAT FORMATTING
-        if (SupremeChat.getInstance().getConfig().getBoolean("enable-chat-format")) {
-            boolean grouping = SupremeChat.getInstance().getConfig().getBoolean("group-formatting");
+        /// CHAT FORMATTING
 
-            String chat;
+
+        boolean enableChatFormat = SupremeChat.getInstance().getConfig().getBoolean("enable-chat-format");
+        String originalMessage = e.getMessage();
+        String chat = originalMessage;
+
+        if (enableChatFormat) {
+            boolean grouping = SupremeChat.getInstance().getConfig().getBoolean("group-formatting");
+            String rank;
 
             if (grouping) {
-                String rank = FormatUtil.getRank(player);
+                rank = FormatUtil.getRank(player);
                 if (getRankFormat(rank) != null) {
                     chat = getRankFormat(rank);
                 } else {
@@ -159,38 +160,43 @@ public class Formatting implements Listener {
                 chat = getGlobalFormat();
             }
 
-            chat = addChatPlaceholers(chat, player, e.getMessage());
-
-            String permission = SupremeChat.getInstance().getConfig().getString("chat-color-permission");
-            boolean hover = SupremeChat.getInstance().getConfig().getBoolean("hover.enable");
-            boolean click = SupremeChat.getInstance().getConfig().getBoolean("click.enable");
-
-            assert permission != null;
-            e.setCancelled(true);
-
-            List<String> hover_m = new ArrayList<>();
-
-            for (String hover_message : SupremeChat.getInstance().getConfig().getStringList("hover.string")) {
-                hover_message = addOtherPlaceholers(hover_message, player);
-                hover_m.add(hover_message);
-            }
-
-            for (Player all : Bukkit.getOnlinePlayers()) {
-                TextComponent msg = new TextComponent(TextComponent.fromLegacyText(format(chat)));
-                if (hover) {
-                    setHoverBroadcastEvent(msg, color(hover_m), player);
-                }
-
-                if (click) {
-                    String clickmsg = SupremeChat.getInstance().getConfig().getString("click.string");
-                    clickmsg = addOtherPlaceholers(clickmsg, player);
-
-                    setClickBroadcastEvent(msg, clickmsg, player);
-                }
-
-                all.spigot().sendMessage(msg);
-            }
+            chat = addChatPlaceholders(chat, player, originalMessage);
         }
+
+        boolean hover = SupremeChat.getInstance().getConfig().getBoolean("hover.enable");
+        boolean click = SupremeChat.getInstance().getConfig().getBoolean("click.enable");
+
+        List<String> hoverMessages = new ArrayList<>();
+
+        for (String hoverMessage : SupremeChat.getInstance().getConfig().getStringList("hover.string")) {
+            hoverMessage = addOtherPlaceholders(hoverMessage, player);
+            hoverMessages.add(hoverMessage);
+        }
+
+        String permission = SupremeChat.getInstance().getConfig().getString("chat-color-permission");
+
+        TextComponent msg = new TextComponent(TextComponent.fromLegacyText(format(chat)));
+
+        if (hover) {
+            setHoverBroadcastEvent(msg, hoverMessages, player);
+        }
+
+        if (click) {
+            String clickMsg = SupremeChat.getInstance().getConfig().getString("click.string");
+            clickMsg = addOtherPlaceholders(clickMsg, player);
+            setClickBroadcastEvent(msg, clickMsg, player);
+        }
+
+        String formattedMessage = TextComponent.toLegacyText(msg);
+
+        if (permission != null && !player.hasPermission(permission)) {
+            // Remove chat color codes if player doesn't have the permission
+            formattedMessage = formattedMessage.replaceAll("&([0-9a-fA-Fk-oK-OrR])", "");
+        }
+
+        formattedMessage = formattedMessage.replaceAll("%", "%%"); // Escape the % character
+
+        e.setFormat(formattedMessage);
     }
 
     private static boolean isWordBlocked(String message, String blockedWord) {

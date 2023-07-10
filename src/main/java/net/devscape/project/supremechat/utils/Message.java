@@ -3,10 +3,7 @@ package net.devscape.project.supremechat.utils;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.devscape.project.supremechat.SupremeChat;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.*;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -50,7 +47,7 @@ public class Message {
         return SupremeChat.getInstance().getConfig().getString("custom-join");
     }
 
-    public static String addChatPlaceholers(String string, Player player, String message) {
+    public static String addChatPlaceholders(String string, Player player, String message) {
         string = string.replace("%name%", player.getName());
         string = string.replace("%message%", message);
         string = string.replace("%world%", player.getLocation().getWorld().getName());
@@ -65,7 +62,7 @@ public class Message {
         return string;
     }
 
-    public static String addOtherPlaceholers(String string, Player player) {
+    public static String addOtherPlaceholders(String string, Player player) {
         string = string.replace("%name%", player.getName());
         string = string.replace("%world%", player.getLocation().getWorld().getName());
         string = string.replace("%x%", String.valueOf(player.getLocation().getX()));
@@ -125,15 +122,16 @@ public class Message {
             return;
         ComponentBuilder hoverMessageBuilder = new ComponentBuilder();
         int hoverLine = 0;
-        for (String hoverMessages : hoverMessagesList) {
-            hoverMessages = addOtherPlaceholers(hoverMessages, broadcastReceivers);
-            TextComponent textComponent = new TextComponent(TextComponent.fromLegacyText(format(hoverMessages)));
+        for (String hoverMessage : hoverMessagesList) {
+            hoverMessage = addOtherPlaceholders(hoverMessage, broadcastReceivers);
+            TextComponent textComponent = new TextComponent(TextComponent.fromLegacyText(format(hoverMessage)));
             hoverMessageBuilder.append(textComponent);
             if (hoverLine != hoverMessagesList.size() - 1)
                 hoverMessageBuilder.append("\n");
             hoverLine++;
         }
-        component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverMessageBuilder.create()));
+        BaseComponent[] hoverComponents = hoverMessageBuilder.create();
+        component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverComponents));
     }
 
     public static void setClickBroadcastEvent(TextComponent component, String click, Player player) {
@@ -142,15 +140,17 @@ public class Message {
         switch (click.charAt(0)) {
             case '/':
                 component.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, click));
-                return;
+                break;
             case '*':
                 component.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, click.substring(1)));
-                return;
+                break;
+            default:
+                click = addOtherPlaceholders(click, player);
+                component.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, click));
+                break;
         }
-
-        click = addOtherPlaceholers(click, player);
-        component.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, click));
     }
+
 
     public static void setClickBroadcastEvent(TextComponent component, String click) {
         if (click == null || click.length() == 0)
