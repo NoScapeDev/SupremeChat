@@ -18,9 +18,11 @@ public class JoinLeave implements Listener {
         String join = getJoin();
         join = addOtherPlaceholders(join, player);
 
-        for (String motd : SupremeChat.getInstance().getConfig().getStringList("motd")) {
-            motd = addOtherPlaceholders(motd, player);
-            msgPlayer(player, motd);
+        if (SupremeChat.getInstance().getConfig().getBoolean("enable-join-motd")) {
+            for (String motd : SupremeChat.getInstance().getConfig().getStringList("motd")) {
+                motd = addOtherPlaceholders(motd, player);
+                msgPlayer(player, motd);
+            }
         }
 
         if (!SupremeChat.getInstance().getConfig().getString("custom-join").isEmpty()) {

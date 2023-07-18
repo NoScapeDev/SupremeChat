@@ -64,6 +64,7 @@ public class Message {
 
     public static String addOtherPlaceholders(String string, Player player) {
         string = string.replace("%name%", player.getName());
+        string = string.replace("%player_name%", player.getName());
         string = string.replace("%world%", player.getLocation().getWorld().getName());
         string = string.replace("%x%", String.valueOf(player.getLocation().getX()));
         string = string.replace("%y%", String.valueOf(player.getLocation().getY()));
@@ -117,9 +118,7 @@ public class Message {
         return mainComponent;
     }
 
-    public static void setHoverBroadcastEvent(TextComponent component, List<String> hoverMessagesList, Player broadcastReceivers) {
-        if (hoverMessagesList.size() == 0)
-            return;
+    public static TextComponent setHoverBroadcastEvent(TextComponent component, List<String> hoverMessagesList, Player broadcastReceivers) {
         ComponentBuilder hoverMessageBuilder = new ComponentBuilder();
         int hoverLine = 0;
         for (String hoverMessage : hoverMessagesList) {
@@ -132,16 +131,20 @@ public class Message {
         }
         BaseComponent[] hoverComponents = hoverMessageBuilder.create();
         component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverComponents));
+
+        return component;
     }
 
-    public static void setClickBroadcastEvent(TextComponent component, String click, Player player) {
+    public static TextComponent setClickBroadcastEvent(TextComponent component, String click, Player player) {
         if (click == null || click.length() == 0)
-            return;
+            return component;
         switch (click.charAt(0)) {
             case '/':
+                click = addOtherPlaceholders(click, player);
                 component.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, click));
                 break;
             case '*':
+                click = addOtherPlaceholders(click, player);
                 component.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, click.substring(1)));
                 break;
             default:
@@ -149,8 +152,8 @@ public class Message {
                 component.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, click));
                 break;
         }
+        return component;
     }
-
 
     public static void setClickBroadcastEvent(TextComponent component, String click) {
         if (click == null || click.length() == 0)

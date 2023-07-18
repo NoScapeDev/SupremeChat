@@ -2,6 +2,10 @@ package net.devscape.project.supremechat.listeners;
 
 import net.devscape.project.supremechat.SupremeChat;
 import net.devscape.project.supremechat.utils.FormatUtil;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -13,6 +17,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -25,7 +30,7 @@ public class Formatting implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void onChat(AsyncPlayerChatEvent e) {
         Player player = e.getPlayer();
-        if (e.isCancelled()) return;
+        if (e.isCancelled()) e.setCancelled(true);
 
         if (SupremeChat.getInstance().getConfig().getBoolean("mute-chat")) {
             if (!player.hasPermission(Objects.requireNonNull(SupremeChat.getInstance().getConfig().getString("bypass-mute-chat-permission")))) {
@@ -139,64 +144,83 @@ public class Formatting implements Listener {
         }
 
         /// CHAT FORMATTING
+        handleChatFormat(e);
+    }
 
+    private void handleChatFormat(AsyncPlayerChatEvent e) {
+        Player player = e.getPlayer();
 
         boolean enableChatFormat = SupremeChat.getInstance().getConfig().getBoolean("enable-chat-format");
         String originalMessage = e.getMessage();
-        String chat = originalMessage;
 
         if (enableChatFormat) {
             boolean grouping = SupremeChat.getInstance().getConfig().getBoolean("group-formatting");
-            String rank;
+            String rank = grouping ? FormatUtil.getRank(player) : null;
+            String chat = getChatFormat(rank);
 
-            if (grouping) {
-                rank = FormatUtil.getRank(player);
-                if (getRankFormat(rank) != null) {
-                    chat = getRankFormat(rank);
+            if (chat != null) {
+                boolean hover = SupremeChat.getInstance().getConfig().getBoolean("hover.enable");
+                boolean click = SupremeChat.getInstance().getConfig().getBoolean("click.enable");
+
+                String permission = SupremeChat.getInstance().getConfig().getString("chat-color-permission");
+
+                if (hover && click) {
+                    for (Player onlinePlayer : e.getRecipients()) {
+                        List<String[]> hoverMessages = new ArrayList<>();
+
+                        for (String hoverMessage : SupremeChat.getInstance().getConfig().getStringList("hover.string")) {
+                            hoverMessage = addOtherPlaceholders(hoverMessage, player);
+                            TextComponent hoverComponent = new TextComponent(format(hoverMessage));
+                            hoverMessages.add(hoverComponent.toLegacyText().split("\n"));
+                        }
+
+                        TextComponent msg = new TextComponent(format(chat));
+                        String formatted = TextComponent.toLegacyText(msg);
+                        formatted = addChatPlaceholders(formatted, player, originalMessage);
+                        msg = new TextComponent(TextComponent.fromLegacyText(format(formatted)));
+
+                        ComponentBuilder hoverBuilder = new ComponentBuilder("");
+                        for (int i = 0; i < hoverMessages.size(); i++) {
+                            String[] hoverMessage = hoverMessages.get(i);
+                            hoverBuilder.append(Arrays.toString(hoverMessage).replace("[", "").replace("]", ""));
+
+                            // Check if it's not the last line
+                            if (i < hoverMessages.size() - 1) {
+                                hoverBuilder.append("\n");
+                            }
+                        }
+
+                        msg.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverBuilder.create()));
+
+                        String clickMsg = SupremeChat.getInstance().getConfig().getString("click.string");
+                        clickMsg = addOtherPlaceholders(clickMsg, player);
+                        msg.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, clickMsg));
+
+                        onlinePlayer.spigot().sendMessage(ChatMessageType.CHAT, msg);
+                    }
+                    e.getRecipients().clear();
                 } else {
-                    chat = getGlobalFormat();
+                    String formattedMessage = format(chat);
+
+                    formattedMessage = addChatPlaceholders(formattedMessage, player, originalMessage);
+
+                    assert permission != null;
+                    e.setFormat(formattedMessage.replace("%message%", player.hasPermission(permission) ? format(originalMessage) : originalMessage).replace("%", "%%").replaceAll("%[^\\w\\s%]", ""));
                 }
-            } else {
-                chat = getGlobalFormat();
             }
+        }
+    }
 
-            chat = addChatPlaceholders(chat, player, originalMessage);
+    private String getChatFormat(String rank) {
+        String chatFormat;
+
+        if (rank != null) {
+            chatFormat = getRankFormat(rank);
+        } else {
+            chatFormat = getGlobalFormat();
         }
 
-        boolean hover = SupremeChat.getInstance().getConfig().getBoolean("hover.enable");
-        boolean click = SupremeChat.getInstance().getConfig().getBoolean("click.enable");
-
-        List<String> hoverMessages = new ArrayList<>();
-
-        for (String hoverMessage : SupremeChat.getInstance().getConfig().getStringList("hover.string")) {
-            hoverMessage = addOtherPlaceholders(hoverMessage, player);
-            hoverMessages.add(hoverMessage);
-        }
-
-        String permission = SupremeChat.getInstance().getConfig().getString("chat-color-permission");
-
-        TextComponent msg = new TextComponent(TextComponent.fromLegacyText(format(chat)));
-
-        if (hover) {
-            setHoverBroadcastEvent(msg, hoverMessages, player);
-        }
-
-        if (click) {
-            String clickMsg = SupremeChat.getInstance().getConfig().getString("click.string");
-            clickMsg = addOtherPlaceholders(clickMsg, player);
-            setClickBroadcastEvent(msg, clickMsg, player);
-        }
-
-        String formattedMessage = TextComponent.toLegacyText(msg);
-
-        if (permission != null && !player.hasPermission(permission)) {
-            // Remove chat color codes if player doesn't have the permission
-            formattedMessage = formattedMessage.replaceAll("&([0-9a-fA-Fk-oK-OrR])", "");
-        }
-
-        formattedMessage = formattedMessage.replaceAll("%", "%%"); // Escape the % character
-
-        e.setFormat(formattedMessage);
+        return chatFormat;
     }
 
     private static boolean isWordBlocked(String message, String blockedWord) {

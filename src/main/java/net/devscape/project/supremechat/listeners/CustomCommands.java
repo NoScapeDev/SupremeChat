@@ -16,11 +16,13 @@ public class CustomCommands implements Listener {
         String cmd = e.getMessage();
         if (SupremeChat.getInstance().getConfig().getConfigurationSection("custom-commands") != null) {
             for (String commands : SupremeChat.getInstance().getConfig().getConfigurationSection("custom-commands").getKeys(false)) {
-                String str = SupremeChat.getInstance().getConfig().getString("custom-commands." + commands + ".string");
-                if (str != null) {
-                    if (cmd.equalsIgnoreCase(commands)) {
-                        e.setCancelled(true);
-                        msgPlayer(player, str);
+                if (commands != null) {
+                    String str = SupremeChat.getInstance().getConfig().getString("custom-commands." + commands + ".string");
+                    if (str != null) {
+                        if (cmd.equalsIgnoreCase(commands)) {
+                            e.setCancelled(true);
+                            msgPlayer(player, str);
+                        }
                     }
                 }
             }

@@ -29,6 +29,9 @@ public class Mention implements Listener {
             }
         }
 
+        assert target != null;
+        if (target.getName().equalsIgnoreCase(event.getPlayer().getName())) return;
+
         String replacement = SupremeChat.getInstance().getConfig().getString("mention-replacement");
         String sound = SupremeChat.getInstance().getConfig().getString("mention-sound.sound");
 
@@ -37,7 +40,7 @@ public class Mention implements Listener {
                 if (target != null) {
                     target.sendMessage("");
 
-                    replacement = replacement.replaceAll("%targer%", target.getName());
+                    replacement = replacement.replaceAll("%target%", target.getName());
 
                     // send formatted message
                     event.setMessage(event.getMessage().replaceAll(target.getName(), format(replacement)));
@@ -52,7 +55,7 @@ public class Mention implements Listener {
                 }
             } else {
                 if (target != null) {
-                    replacement = replacement.replaceAll("%targer%", target.getName());
+                    replacement = replacement.replaceAll("%target%", target.getName());
 
                     // send formatted message
                     event.setMessage(event.getMessage().replaceAll(target.getName(), format(replacement)));

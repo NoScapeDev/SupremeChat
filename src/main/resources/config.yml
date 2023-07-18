@@ -61,6 +61,8 @@ custom-leave: '&8[&c&l-&8] &7%name%'
 
 vanish-support: true # allow to join silent if vanished.
 
+enable-join-motd: true # should 'motd' be enabled.
+
 motd:
   - '&8&m----------------------------'
   - '&#ca04fb&lY&#d006e2&lO&#d509c9&lU&#db0bb0&lR&#e10e97&lS&#e6107e&lE&#ec1365&lR&#f2154c&lV&#f71833&lE&#fd1a1a&lR'

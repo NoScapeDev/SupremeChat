@@ -6,6 +6,7 @@ import net.devscape.project.supremechat.listeners.*;
 import net.devscape.project.supremechat.utils.FormatUtil;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.permission.Permission;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -55,10 +56,7 @@ public final class SupremeChat extends JavaPlugin {
 
         saveDefaultConfig();
 
-        if (getServer().getPluginManager().getPlugin("Vault") != null) {
-            setupPermissions();
-            setupChat();
-        }
+        setupVault();
 
         getCommand("supremechat").setExecutor(new SCCommand());
 
@@ -72,21 +70,35 @@ public final class SupremeChat extends JavaPlugin {
         callMetrics();
     }
 
-    private boolean setupPermissions() {
-        RegisteredServiceProvider<Permission> rsp = getServer().getServicesManager().getRegistration(Permission.class);
-        perms = rsp.getProvider();
-        return perms != null;
+    private boolean setupVault() {
+        if (Bukkit.getPluginManager().getPlugin("Vault") == null) {
+            // Vault plugin not found
+            return false;
+        }
+
+        RegisteredServiceProvider<Permission> permProvider = getServer().getServicesManager()
+                .getRegistration(Permission.class);
+        if (permProvider == null) {
+            // Permission service not found
+            return false;
+        }
+        perms = permProvider.getProvider();
+
+        RegisteredServiceProvider<Chat> chatProvider = getServer().getServicesManager()
+                .getRegistration(Chat.class);
+        if (chatProvider == null) {
+            // Chat service not found
+            return false;
+        }
+        chat = chatProvider.getProvider();
+
+        return true;
     }
 
     public static Permission getPermissions() {
         return perms;
     }
 
-    private void setupChat() {
-        RegisteredServiceProvider<Chat> rsp = getServer().getServicesManager().getRegistration(Chat.class);
-        assert rsp != null;
-        chat = rsp.getProvider();
-    }
 
     public List<Player> getChatDelayList() {
         return chatDelayList;
@@ -94,8 +106,6 @@ public final class SupremeChat extends JavaPlugin {
 
     public void reload() {
         super.reloadConfig();
-
-
     }
 
     public Map<Player, String> getLastMessage() {
