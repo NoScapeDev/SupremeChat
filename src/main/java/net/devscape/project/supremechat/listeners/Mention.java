@@ -8,6 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import static net.devscape.project.supremechat.utils.Message.format;
 
@@ -29,7 +30,7 @@ public class Mention implements Listener {
             }
         }
 
-        assert target != null;
+        if (target == null) return;
         if (target.getName().equalsIgnoreCase(event.getPlayer().getName())) return;
 
         String replacement = SupremeChat.getInstance().getConfig().getString("mention-replacement");
@@ -37,32 +38,30 @@ public class Mention implements Listener {
 
         if (replacement != null) {
             if (SupremeChat.getInstance().getConfig().getBoolean("mention-spaces")) {
-                if (target != null) {
-                    target.sendMessage("");
+                target.sendMessage("");
 
-                    replacement = replacement.replaceAll("%target%", target.getName());
+                replacement = replacement.replaceAll("%target%", target.getName());
 
-                    // send formatted message
-                    event.setMessage(event.getMessage().replaceAll(target.getName(), format(replacement)));
-                }
+                // send formatted message
+                event.setMessage(event.getMessage().replaceAll(target.getName(), format(replacement)));
 
-                if (target != null) {
-                    target.sendMessage("");
+                Player finalTarget = target;
+                new BukkitRunnable() {
 
-                    if (SupremeChat.getInstance().getConfig().getBoolean("mention-sound.enable")) {
-                        target.playSound(target.getLocation(), Sound.valueOf(sound), 1, 1);
+                    @Override
+                    public void run() {
+                        finalTarget.sendMessage("");
                     }
-                }
+                }.runTaskLater(SupremeChat.getInstance(), 20L);
+
             } else {
-                if (target != null) {
-                    replacement = replacement.replaceAll("%target%", target.getName());
+                replacement = replacement.replaceAll("%target%", target.getName());
 
-                    // send formatted message
-                    event.setMessage(event.getMessage().replaceAll(target.getName(), format(replacement)));
-                    if (SupremeChat.getInstance().getConfig().getBoolean("mention-sound.enable")) {
-                        target.playSound(target.getLocation(), Sound.valueOf(sound), 1, 1);
-                    }
-                }
+                // send formatted message
+                event.setMessage(event.getMessage().replaceAll(target.getName(), format(replacement)));
+            }
+            if (SupremeChat.getInstance().getConfig().getBoolean("mention-sound.enable")) {
+                target.playSound(target.getLocation(), Sound.valueOf(sound), 1, 1);
             }
         }
     }

@@ -102,9 +102,9 @@ mention-sound:
 # CHAT FILTER:
 #
 # set `chat-delay` to 0 if you want to disable chat delay.
-# set `action-detect` to 0 if you want to disable 'action'.
 # ==================================================
 
+word-detect-enable: true
 word-detect: '&cThe word &7%word% &cis banned from the server!'
 word-detect-staff: '&c[Filter] &7%name%: &c[&7%message%&c]'
 word-detect-alert-staff: true
