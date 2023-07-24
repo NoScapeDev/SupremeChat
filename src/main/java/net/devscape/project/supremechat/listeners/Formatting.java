@@ -181,17 +181,21 @@ public class Formatting implements Listener {
                         msg = new TextComponent(TextComponent.fromLegacyText(format(formatted)));
 
                         ComponentBuilder hoverBuilder = new ComponentBuilder("");
+
                         for (int i = 0; i < hoverMessages.size(); i++) {
                             String[] hoverMessage = hoverMessages.get(i);
-                            hoverBuilder.append(Arrays.toString(hoverMessage).replace("[", "").replace("]", ""));
 
-                            // Check if it's not the last line
+                            TextComponent hoverTextComponent = new TextComponent(TextComponent.fromLegacyText(Arrays.toString(hoverMessage).replace("[", "").replace("]", "")));
+
+                            hoverBuilder.append(hoverTextComponent);
+
                             if (i < hoverMessages.size() - 1) {
                                 hoverBuilder.append("\n");
                             }
                         }
 
                         msg.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverBuilder.create()));
+
 
                         String clickMsg = SupremeChat.getInstance().getConfig().getString("click.string");
                         clickMsg = addOtherPlaceholders(clickMsg, player);

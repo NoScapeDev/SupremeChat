@@ -6,7 +6,7 @@
 
     <groupId>net.devscape.project</groupId>
     <artifactId>SupremeChat</artifactId>
-    <version>1.2.12</version>
+    <version>1.2.13</version>
     <packaging>jar</packaging>
 
     <name>SupremeChat</name>
