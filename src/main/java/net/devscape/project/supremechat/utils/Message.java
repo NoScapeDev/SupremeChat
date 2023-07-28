@@ -47,9 +47,8 @@ public class Message {
         return SupremeChat.getInstance().getConfig().getString("custom-join");
     }
 
-    public static String addChatPlaceholders(String string, Player player, String message) {
+    public static String addChatPlaceholders(String string, Player player) {
         string = string.replace("%name%", player.getName());
-        string = string.replace("%message%", message);
         string = string.replace("%world%", player.getLocation().getWorld().getName());
         string = string.replace("%x%", String.valueOf(player.getLocation().getX()));
         string = string.replace("%y%", String.valueOf(player.getLocation().getY()));

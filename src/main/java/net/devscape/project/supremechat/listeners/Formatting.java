@@ -167,6 +167,8 @@ public class Formatting implements Listener {
     private void handleChatFormat(AsyncPlayerChatEvent e) {
         Player player = e.getPlayer();
 
+        if (e.isCancelled()) e.setCancelled(true);
+
         boolean enableChatFormat = SupremeChat.getInstance().getConfig().getBoolean("enable-chat-format");
         String originalMessage = e.getMessage();
 
@@ -181,7 +183,7 @@ public class Formatting implements Listener {
 
                 String permission = SupremeChat.getInstance().getConfig().getString("chat-color-permission");
 
-                if (hover && click) {
+                if (hover || click) {
                     for (Player onlinePlayer : e.getRecipients()) {
                         List<String[]> hoverMessages = new ArrayList<>();
 
@@ -192,30 +194,36 @@ public class Formatting implements Listener {
                         }
 
                         TextComponent msg = new TextComponent(format(chat));
+
                         String formatted = TextComponent.toLegacyText(msg);
-                        formatted = addChatPlaceholders(formatted, player, originalMessage);
+                        formatted = formatted.replace("%message%", format(originalMessage).replace("%", "%%"));
+                        formatted = addChatPlaceholders(formatted, player);
+
                         msg = new TextComponent(TextComponent.fromLegacyText(format(formatted)));
 
                         ComponentBuilder hoverBuilder = new ComponentBuilder("");
 
-                        for (int i = 0; i < hoverMessages.size(); i++) {
-                            String[] hoverMessage = hoverMessages.get(i);
+                        if (hover) {
+                            for (int i = 0; i < hoverMessages.size(); i++) {
+                                String[] hoverMessage = hoverMessages.get(i);
 
-                            TextComponent hoverTextComponent = new TextComponent(TextComponent.fromLegacyText(Arrays.toString(hoverMessage).replace("[", "").replace("]", "")));
+                                TextComponent hoverTextComponent = new TextComponent(TextComponent.fromLegacyText(Arrays.toString(hoverMessage).replace("[", "").replace("]", "")));
 
-                            hoverBuilder.append(hoverTextComponent);
+                                hoverBuilder.append(hoverTextComponent);
 
-                            if (i < hoverMessages.size() - 1) {
-                                hoverBuilder.append("\n");
+                                if (i < hoverMessages.size() - 1) {
+                                    hoverBuilder.append("\n");
+                                }
                             }
+
+                            msg.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverBuilder.create()));
                         }
 
-                        msg.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverBuilder.create()));
-
-
-                        String clickMsg = SupremeChat.getInstance().getConfig().getString("click.string");
-                        clickMsg = addOtherPlaceholders(clickMsg, player);
-                        msg.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, clickMsg));
+                        if (click) {
+                            String clickMsg = SupremeChat.getInstance().getConfig().getString("click.string");
+                            clickMsg = addOtherPlaceholders(clickMsg, player);
+                            msg.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, clickMsg));
+                        }
 
                         onlinePlayer.spigot().sendMessage(ChatMessageType.CHAT, msg);
                     }
@@ -223,7 +231,7 @@ public class Formatting implements Listener {
                 } else {
                     String formattedMessage = format(chat);
 
-                    formattedMessage = addChatPlaceholders(formattedMessage, player, originalMessage);
+                    formattedMessage = addChatPlaceholders(formattedMessage, player);
 
                     assert permission != null;
                     e.setFormat(formattedMessage.replace("%message%", player.hasPermission(permission) ? format(originalMessage) : originalMessage).replace("%", "%%").replaceAll("%[^\\w\\s%]", ""));
