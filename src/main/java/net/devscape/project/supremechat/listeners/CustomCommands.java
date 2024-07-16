@@ -14,6 +14,22 @@ public class CustomCommands implements Listener {
     public void onCommand(PlayerCommandPreprocessEvent e) {
         Player player = e.getPlayer();
         String cmd = e.getMessage();
+
+        if (e.isCancelled()) return;
+
+        boolean anti_bot = SupremeChat.getInstance().getConfig().getBoolean("anti-bot.commands");
+
+        if (anti_bot) {
+            if (SupremeChat.getInstance().getPrevention().contains(player)) {
+                e.setCancelled(true);
+                String detect_alert = SupremeChat.getInstance().getConfig().getString("anti-bot.message");
+                detect_alert = detect_alert.replaceAll("%name%", player.getName());
+
+                msgPlayer(player, detect_alert);
+                return;
+            }
+        }
+
         if (SupremeChat.getInstance().getConfig().getConfigurationSection("custom-commands") != null) {
             for (String commands : SupremeChat.getInstance().getConfig().getConfigurationSection("custom-commands").getKeys(false)) {
                 if (commands != null) {

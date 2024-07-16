@@ -18,7 +18,7 @@ public class CommandFilter implements Listener {
         if (e.isCancelled()) return;
 
         // command spam detect
-        if (!player.hasPermission("sc.bypass")) {
+        if (!player.hasPermission("sc.bypass") || !player.isOp()) {
             if (SupremeChat.getInstance().getConfig().getInt("command-delay") >= 1) {
                 if (!SupremeChat.getInstance().getCommandDelayList().contains(player)) {
                     SupremeChat.getInstance().getCommandDelayList().add(player);

@@ -4,6 +4,7 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import net.devscape.project.supremechat.SupremeChat;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.*;
+import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -88,8 +89,12 @@ public class Message {
 
     public static String replacePlaceholders(Player p, String message) {
         String holders = message;
-        if (PlaceholderAPI.containsPlaceholders(holders))
-            holders = PlaceholderAPI.setPlaceholders(p, holders);
+
+        if (Bukkit.getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            if (PlaceholderAPI.containsPlaceholders(holders))
+                holders = PlaceholderAPI.setPlaceholders(p, holders);
+        }
+
         return holders;
     }
 

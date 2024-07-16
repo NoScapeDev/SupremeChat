@@ -27,147 +27,170 @@ import static net.devscape.project.supremechat.utils.Message.*;
 
 public class Formatting implements Listener {
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.NORMAL)
     public void onChat(AsyncPlayerChatEvent e) {
         Player player = e.getPlayer();
-        if (e.isCancelled()) e.setCancelled(true);
 
-        boolean containsbadword = false;
+        if (!e.isCancelled()) {
+            boolean repeated = false;
+            boolean containsbadword = false;
 
-        if (SupremeChat.getInstance().getConfig().getBoolean("mute-chat")) {
-            if (!player.hasPermission(Objects.requireNonNull(SupremeChat.getInstance().getConfig().getString("bypass-mute-chat-permission")))) {
-                msgPlayer(player, "&cChat is currently muted!");
-                e.setCancelled(true);
-                return;
-            }
-        }
+            boolean anti_bot = SupremeChat.getInstance().getConfig().getBoolean("anti-bot.chat");
 
-        // BANNED WORD DETECTION
-        if (SupremeChat.getInstance().getConfig().getBoolean("word-detect-enable")) {
-            if (!player.hasPermission("sc.bypass")) {
-                for (String word : SupremeChat.getInstance().getConfig().getStringList("banned-words")) {
-                    if (isWordBlocked(e.getMessage(), word)) {
-                        e.setCancelled(true);
-
-                        containsbadword = true;
-
-                        String detect = SupremeChat.getInstance().getConfig().getString("word-detect");
-                        detect = detect.replaceAll("%word%", word);
-
-                        msgPlayer(player, detect);
-
-                        // alert staff
-                        for (Player staff : Bukkit.getOnlinePlayers()) {
-                            if (staff.hasPermission(SupremeChat.getInstance().getConfig().getString("detect-alert-staff-permission"))) {
-                                String detect_alert = SupremeChat.getInstance().getConfig().getString("word-detect-staff");
-                                detect_alert = detect_alert.replaceAll("%message%", e.getMessage());
-                                detect_alert = detect_alert.replaceAll("%name%", player.getName());
-
-                                msgPlayer(staff, detect_alert);
-                                break;
-                            }
-                        }
-                        break;
-                    }
-                }
-            }
-        }
-
-
-        // CHAT DELAY
-        if (SupremeChat.getInstance().getConfig().getInt("chat-delay") >= 1) {
-            if (!player.hasPermission("sc.bypass")) {
-                if (!SupremeChat.getInstance().getChatDelayList().contains(player)) {
-                    SupremeChat.getInstance().getChatDelayList().add(player);
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            SupremeChat.getInstance().getChatDelayList().remove(player);
-                        }
-                    }.runTaskLaterAsynchronously(SupremeChat.getInstance(), 20L * SupremeChat.getInstance().getConfig().getInt("chat-delay"));
-                } else {
+            if (anti_bot) {
+                if (SupremeChat.getInstance().getPrevention().contains(player)) {
                     e.setCancelled(true);
-                    msgPlayer(player, SupremeChat.getInstance().getConfig().getString("chat-warn"));
+                    String detect_alert = SupremeChat.getInstance().getConfig().getString("anti-bot.message");
+                    detect_alert = detect_alert.replaceAll("%name%", player.getName());
+
+                    msgPlayer(player, detect_alert);
+                    return;
                 }
             }
-        }
 
-
-        // REPEAT FILTER
-        if (SupremeChat.getInstance().getConfig().getBoolean("repeat-enable")) {
-            if (!player.hasPermission("sc.bypass")) {
-                if (SupremeChat.getInstance().getLastMessage().containsKey(player)) {
-                    String lastMessage = SupremeChat.getInstance().getLastMessage().get(player);
-                    String newMessage = e.getMessage();
-
-                    if (newMessage.contains(lastMessage)) {
-                        e.setCancelled(true);
-                        msgPlayer(player, SupremeChat.getInstance().getConfig().getString("repeat-warn"));
-                    } else {
-                        SupremeChat.getInstance().getLastMessage().remove(player);
-                        SupremeChat.getInstance().getLastMessage().put(player, newMessage);
-                    }
-                } else {
-                    String newMessage = e.getMessage();
-                    SupremeChat.getInstance().getLastMessage().put(player, newMessage);
+            if (SupremeChat.getInstance().getConfig().getBoolean("mute-chat")) {
+                if (!player.hasPermission(Objects.requireNonNull(SupremeChat.getInstance().getConfig().getString("bypass-mute-chat-permission"))) || !player.isOp()) {
+                    msgPlayer(player, "&cChat is currently muted!");
+                    e.setCancelled(true);
+                    return;
                 }
             }
-        }
 
+            // BANNED WORD DETECTION
+            if (SupremeChat.getInstance().getConfig().getBoolean("word-detect-enable")) {
+                if (!player.hasPermission("sc.bypass") || !player.isOp()) {
+                    for (String word : SupremeChat.getInstance().getConfig().getStringList("banned-words")) {
+                        if (isWordBlocked(e.getMessage(), word)) {
+                            e.setCancelled(true);
 
-        // CAPS FILTER
-        if (SupremeChat.getInstance().getConfig().getBoolean("caps-lowercase")) {
-            if (!player.hasPermission("sc.bypass")) {
-                if (e.getMessage().chars().filter(Character::isUpperCase).count() >= SupremeChat.getInstance().getConfig().getInt("caps-limit")) {
-                    for (final char c : e.getMessage().toCharArray()) {
-                        if (Character.isUpperCase(c)) {
-                            if (!SupremeChat.getInstance().getConfig().getBoolean("disable-caps-warn")) {
-                                msgPlayer(player, SupremeChat.getInstance().getConfig().getString("caps-warn"));
+                            containsbadword = true;
+
+                            String detect = SupremeChat.getInstance().getConfig().getString("word-detect");
+                            detect = detect.replaceAll("%word%", word);
+
+                            msgPlayer(player, detect);
+
+                            // alert staff
+                            for (Player staff : Bukkit.getOnlinePlayers()) {
+                                if (staff.hasPermission(SupremeChat.getInstance().getConfig().getString("detect-alert-staff-permission"))) {
+                                    String detect_alert = SupremeChat.getInstance().getConfig().getString("word-detect-staff");
+                                    detect_alert = detect_alert.replaceAll("%message%", e.getMessage());
+                                    detect_alert = detect_alert.replaceAll("%name%", player.getName());
+
+                                    msgPlayer(staff, detect_alert);
+                                    break;
+                                }
                             }
-                            e.setMessage(format(e.getMessage().toLowerCase()));
                             break;
                         }
                     }
                 }
             }
-        }
 
-        // ITEM IN CHAT
-        ItemStack item = player.getInventory().getItemInMainHand();
-        boolean itemChat = SupremeChat.getInstance().getConfig().getBoolean("enable-chat-item");
-        String replacement = SupremeChat.getInstance().getConfig().getString("chat-item-replace");
-        assert replacement != null;
 
-        if (item.getItemMeta() != null) {
-            String displayName = item.getItemMeta().hasDisplayName() ? item.getItemMeta().getDisplayName() : item.getType().name();
-            replacement = replacement.replaceAll("%item%", format("x" + item.getAmount() + " " + displayName));
-        } else {
-            replacement = replacement.replaceAll("%item%", format("x" + item.getAmount() + " " + item.getType().name()));
-        }
-
-        String message = e.getMessage();
-
-        if (itemChat) {
-            for (String itemString : SupremeChat.getInstance().getConfig().getStringList("chat-item-strings")) {
-                if (message.contains(itemString)) {
-                    e.setMessage(message.replace(itemString, format(replacement)));
-                    break;
+            // CHAT DELAY
+            if (SupremeChat.getInstance().getConfig().getInt("chat-delay") >= 1) {
+                if (!containsbadword) {
+                    if (!player.hasPermission("sc.bypass") || !player.isOp()) {
+                        if (!SupremeChat.getInstance().getChatDelayList().contains(player)) {
+                            SupremeChat.getInstance().getChatDelayList().add(player);
+                            new BukkitRunnable() {
+                                @Override
+                                public void run() {
+                                    SupremeChat.getInstance().getChatDelayList().remove(player);
+                                }
+                            }.runTaskLaterAsynchronously(SupremeChat.getInstance(), 20L * SupremeChat.getInstance().getConfig().getInt("chat-delay"));
+                        } else {
+                            e.setCancelled(true);
+                            msgPlayer(player, SupremeChat.getInstance().getConfig().getString("chat-warn"));
+                        }
+                    }
                 }
             }
-        }
 
-        /// CHAT FORMATTING
-        if (!containsbadword) {
-            handleChatFormat(e);
-        } else {
-            e.setCancelled(true);
+
+            // REPEAT FILTER
+            if (SupremeChat.getInstance().getConfig().getBoolean("repeat-enable")) {
+                if (!containsbadword) {
+                    if (!player.hasPermission("sc.bypass") || !player.isOp()) {
+                        if (SupremeChat.getInstance().getLastMessage().containsKey(player)) {
+                            String lastMessage = SupremeChat.getInstance().getLastMessage().get(player);
+                            String newMessage = e.getMessage();
+
+                            if (newMessage.contains(lastMessage)) {
+                                e.setCancelled(true);
+
+                                repeated = true;
+
+                                msgPlayer(player, SupremeChat.getInstance().getConfig().getString("repeat-warn"));
+                            } else {
+                                SupremeChat.getInstance().getLastMessage().remove(player);
+                                SupremeChat.getInstance().getLastMessage().put(player, newMessage);
+                            }
+                        } else {
+                            String newMessage = e.getMessage();
+                            SupremeChat.getInstance().getLastMessage().put(player, newMessage);
+                        }
+                    }
+                }
+            }
+
+
+            // CAPS FILTER
+            if (SupremeChat.getInstance().getConfig().getBoolean("caps-lowercase")) {
+                if (!player.hasPermission("sc.bypass") || !player.isOp()) {
+                    if (e.getMessage().chars().filter(Character::isUpperCase).count() >= SupremeChat.getInstance().getConfig().getInt("caps-limit")) {
+                        for (final char c : e.getMessage().toCharArray()) {
+                            if (Character.isUpperCase(c)) {
+                                if (!SupremeChat.getInstance().getConfig().getBoolean("disable-caps-warn")) {
+                                    msgPlayer(player, SupremeChat.getInstance().getConfig().getString("caps-warn"));
+                                }
+                                e.setMessage(format(e.getMessage().toLowerCase()));
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            boolean itemChat = SupremeChat.getInstance().getConfig().getBoolean("enable-chat-item");
+
+
+            if (itemChat) {
+                // ITEM IN CHAT
+                ItemStack item = player.getInventory().getItemInMainHand();
+
+                String replacement = SupremeChat.getInstance().getConfig().getString("chat-item-replace");
+                assert replacement != null;
+
+                if (item.getItemMeta() != null) {
+                    String displayName = item.getItemMeta().hasDisplayName() ? item.getItemMeta().getDisplayName() : item.getType().name();
+                    replacement = replacement.replaceAll("%item%", format("x" + item.getAmount() + " " + displayName));
+                } else {
+                    replacement = replacement.replaceAll("%item%", format("x" + item.getAmount() + " " + item.getType().name()));
+                }
+
+                String message = e.getMessage();
+
+                for (String itemString : SupremeChat.getInstance().getConfig().getStringList("chat-item-strings")) {
+                    if (message.contains(itemString)) {
+                        e.setMessage(message.replace(itemString, format(replacement)));
+                        break;
+                    }
+                }
+            }
+
+            /// CHAT FORMATTING
+            if (!containsbadword && !repeated) {
+                handleChatFormat(e);
+            } else {
+                e.setCancelled(true);
+            }
         }
     }
 
     private void handleChatFormat(AsyncPlayerChatEvent e) {
         Player player = e.getPlayer();
-
-        if (e.isCancelled()) e.setCancelled(true);
 
         boolean enableChatFormat = SupremeChat.getInstance().getConfig().getBoolean("enable-chat-format");
         String originalMessage = e.getMessage();

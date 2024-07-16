@@ -23,7 +23,7 @@ public class SCCommand implements CommandExecutor {
             Player player = (Player) sender;
 
             if (cmd.getName().equalsIgnoreCase("supremechat")) {
-                if (player.hasPermission("supremechat.admin")) {
+                if (player.hasPermission("supremechat.admin") || player.isOp()) {
                     if (args.length == 0) {
                         FormatUtil.sendHelp(player);
                     } else if (args.length == 1) {

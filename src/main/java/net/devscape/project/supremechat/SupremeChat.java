@@ -23,6 +23,8 @@ public final class SupremeChat extends JavaPlugin {
     private static Chat chat;
 
     private final List<Player> chatDelayList = new ArrayList<>();
+    // prevention list for preventing bot attacks
+    private final List<Player> prevention = new ArrayList<>();
     private final List<Player> commandDelayList = new ArrayList<>();
     private final Map<Player, String> lastMessage = new HashMap<>();
     private FormatUtil formattingUtils;
@@ -138,5 +140,9 @@ public final class SupremeChat extends JavaPlugin {
             }
             return map;
         }));
+    }
+
+    public List<Player> getPrevention() {
+        return prevention;
     }
 }

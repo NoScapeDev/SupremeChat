@@ -7,6 +7,23 @@
 # - Vault Support
 # ==================================================
 
+# logging settings
+logging:
+  chat: true
+  command: true
+
+# ==================================================
+# ANTI-BOT
+#
+# what this does if true?
+# - prevents from chatting on join until player moves.
+# - prevents from using commands on join until player moves.
+# ==================================================
+anti-bot:
+  chat: true
+  commands: true
+  message: '&c&lPrevention &8&l➟ &7Please move before performing this.'
+
 # mute chat settings
 mute-chat: false
 bypass-mute-chat-permission: 'supremechat.bypass.mutechat'
